@@ -1,7 +1,7 @@
 // const title = "React";
 import List from "./components/list";
-import Search from "./components/serach";
-import { useEffect, useState } from "react";
+import InputWithLabel from "./components/InputWithLabel";
+import useStorageState from "./hooks/useStorageState";
 
 const welcome = {
 	greeting: "Hi",
@@ -27,26 +27,26 @@ const App = () => {
 			points: 5,
 		},
 	];
-	const [searchTerm, setSearchTerm] = useState(
-		localStorage.getItem("search") || ""
-	);
+	const [searchTerm, setSearchTerm] = useStorageState("search", "");
 	const handleSearch = (event) => {
 		setSearchTerm(event.target.value);
 	};
 
-	useEffect(() => {
-		localStorage.setItem("search", searchTerm);
-	},[searchTerm]);
 	const searchStories = stories.filter((story) =>
 		story.title.toLowerCase().includes(searchTerm.toLowerCase())
 	);
-	
+
 	return (
 		<div>
 			<h1>
 				{welcome.greeting} {welcome.title}
 			</h1>
-			<Search search={searchTerm} onSearch={handleSearch} />
+			<InputWithLabel
+				id="search"
+				label="search"
+				value={searchTerm}
+				onInputChange={handleSearch}
+			/>
 			<List list={searchStories} />
 		</div>
 	);
