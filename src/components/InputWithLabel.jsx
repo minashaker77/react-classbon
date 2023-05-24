@@ -1,5 +1,5 @@
 
-const InputWithLabel = ({id,label,value , onInputChange}) => {
+const InputWithLabel = ({id,label,value , onInputChange , type='text'}) => {
 
 	const handleChange = (event) => {
 		onInputChange(event);
@@ -9,7 +9,7 @@ const InputWithLabel = ({id,label,value , onInputChange}) => {
 			<label htmlFor={id}>{label}</label>
 			<input
 				onChange={handleChange}
-				type="text"
+				type={type}
 				id={id}
 				value={value}
 			/>
