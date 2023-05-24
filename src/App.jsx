@@ -46,6 +46,7 @@ const App = () => {
 				label="Search"
 				value={searchTerm}
 				onInputChange={handleSearch}
+				isFocused={true}
 			/>
 			<List list={searchStories} />
 		</div>
