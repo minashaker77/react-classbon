@@ -2,7 +2,7 @@
 import List from "./components/list";
 import InputWithLabel from "./components/InputWithLabel";
 import useStorageState from "./hooks/useStorageState";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 
 const welcome = {
 	greeting: "Hi",
@@ -33,58 +33,32 @@ const storiesReducer = (state, action) => {
 		case "REMOVE_STORIES":
 			return {
 				...state,
-				data: state.data.filter((story) => story.id !== action.payload)
-			}
+				data: state.data.filter((story) => story.id !== action.payload),
+			};
 		default:
 			return state;
 	}
 };
+const API_ENDPOINT = "https://react-mini-projects-api.classbon.com/Story/list";
 
 const App = () => {
-	const initialStories = [
-		{
-			id: 0,
-			title: "React",
-			url: "https://reactjs.org",
-			author: "Reza Ahmadi",
-			num_comments: 3,
-			points: 4,
-		},
-		{
-			id: 1,
-			title: "Redux",
-			url: "https://redux.js.org",
-			author: "Mohammad",
-			num_comments: 2,
-			points: 5,
-		},
-	];
-
 	const [stories, dispatchStories] = useReducer(storiesReducer, {
 		data: [],
 		isLoading: false,
 		isError: false,
 	});
 	const [searchTerm, setSearchTerm] = useStorageState("search", "");
-	// const [isLoading, setIsLoading] = useState(false);
-	// const [isError, setIsError] = useState(false);
-
-	const getAsyncStories = () =>
-		new Promise((resolve) => {
-			setTimeout(() => {
-				resolve({ data: { stories: initialStories } });
-				// reject();
-			}, 2000);
-		});
 
 	useEffect(() => {
-		dispatchStories({type:'STORIES_FETCH_INIT'});
-		getAsyncStories()
-			.then((result) => {
-				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.stories });
+		if (!searchTerm) return;
+		dispatchStories({ type: "STORIES_FETCH_INIT" });
+		fetch(`${API_ENDPOINT}?query=${searchTerm}`)
+			.then((response) => response.json())
+			.then((stories) => {
+				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: stories });
 			})
-			.catch(() => dispatchStories({type: 'STORIES_FETCH_FAILURE'}));
-	}, []);
+			.catch(() => dispatchStories({ type: "STORIES_FETCH_FAILURE" }));
+	}, [searchTerm]);
 
 	const handleRemoveStory = (id) => {
 		dispatchStories({ type: "REMOVE_STORIES", payload: id });
@@ -94,9 +68,9 @@ const App = () => {
 		setSearchTerm(event.target.value);
 	};
 
-	const searchStories = stories.data.filter((story) =>
-		story.title.toLowerCase().includes(searchTerm.toLowerCase())
-	);
+	// const searchStories = stories.data.filter((story) =>
+	// 	story.title.toLowerCase().includes(searchTerm.toLowerCase())
+	// );
 
 	// if(isLoading){
 	// 	return <p>Loading ...</p>
@@ -120,7 +94,7 @@ const App = () => {
 			{stories.isLoading ? (
 				<p>Loading ...</p>
 			) : (
-				<List list={searchStories} onRemoveItem={handleRemoveStory} />
+				<List list={stories.data} onRemoveItem={handleRemoveStory} />
 			)}
 		</div>
 	);
