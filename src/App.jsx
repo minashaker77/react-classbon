@@ -2,11 +2,22 @@
 import List from "./components/list";
 import InputWithLabel from "./components/InputWithLabel";
 import useStorageState from "./hooks/useStorageState";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 const welcome = {
 	greeting: "Hi",
 	title: "React",
+};
+
+const storiesReducer = (state, action) => {
+	switch (action.type) {
+		case "SET_STORIES":
+			return action.payload;
+		case "REMOVE_STORIES":
+			return state.filter((story) => story.id !== action.payload);
+		default:
+			return state;
+	}
 };
 
 const App = () => {
@@ -29,32 +40,33 @@ const App = () => {
 		},
 	];
 
-	const [stories, setStories] = useState([]);
+	const [stories , dispatchStories]= useReducer(storiesReducer , [])
+	// const [stories, setStories] = useState([]);
 	const [searchTerm, setSearchTerm] = useStorageState("search", "");
 	const [isLoading, setIsLoading] = useState(false);
-	const [ isError , setIsError ] = useState(false);
+	const [isError, setIsError] = useState(false);
 
 	const getAsyncStories = () =>
-		new Promise((resolve , reject) => {
+		new Promise((resolve) => {
 			setTimeout(() => {
-				// resolve({ data: { stories: initialStories } });
-				reject();
+				resolve({ data: { stories: initialStories } });
+				// reject();
 			}, 2000);
 		});
 
 	useEffect(() => {
 		setIsLoading(true);
-		getAsyncStories().then((result) => {
-			setStories(result.data.stories);
-			setIsLoading(false);
-		}).catch(()=> setIsError(true));
+		getAsyncStories()
+			.then((result) => {
+				dispatchStories({type:'SET_STORIES' , payload:result.data.stories});
+				setIsLoading(false);
+			})
+			.catch(() => setIsError(true));
 	}, []);
 
-
-
 	const handleRemoveStory = (id) => {
-		const newStories = stories.filter((story) => story.id !== id);
-		setStories(newStories);
+		dispatchStories({type:'REMOVE_STORIES' , payload:id})
+		// dispatchStories({type:'SET_STORIES' , payload:newStories});
 	};
 	const handleSearch = (event) => {
 		setSearchTerm(event.target.value);
