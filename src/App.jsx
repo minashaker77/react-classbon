@@ -2,7 +2,7 @@
 import List from "./components/list";
 import InputWithLabel from "./components/InputWithLabel";
 import useStorageState from "./hooks/useStorageState";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const welcome = {
 	greeting: "Hi",
@@ -29,9 +29,20 @@ const App = () => {
 		},
 	];
 
-	const [stories , setStories] = useState(initialStories);
+	const [stories , setStories] = useState([]);
 
 	const [searchTerm, setSearchTerm] = useStorageState("search", "");
+	const getAsyncStories = ()=> new Promise(resolve =>{
+		setTimeout(() => {
+			resolve({data:{stories: initialStories}})
+		}, 2000);
+	})
+
+	useEffect(()=>{
+		getAsyncStories().then(result =>{
+			setStories(result.data.stories);
+		} )
+	})
 
 	const handleRemoveStory = (id)=>{
 		const newStories = stories.filter(story => story.id !== id);
