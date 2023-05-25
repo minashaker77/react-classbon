@@ -1,11 +1,11 @@
 import Item from "./item";
 
-const List = ({list}) => {
+const List = ({list , onRemoveItem}) => {
 	return (
 		<ul>
 			{
-				list.map(({id, ...item}) => (
-					<Item key={id} {...item} />
+				list.map((item) => (
+					<Item key={item.id} {...item} onRemoveItem={onRemoveItem} />
 				))
 				// list.map(function (item , index) {
 				// 	return <li key={index}>{item.title}</li>

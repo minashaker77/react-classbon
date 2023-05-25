@@ -2,6 +2,7 @@
 import List from "./components/list";
 import InputWithLabel from "./components/InputWithLabel";
 import useStorageState from "./hooks/useStorageState";
+import { useState } from "react";
 
 const welcome = {
 	greeting: "Hi",
@@ -9,7 +10,7 @@ const welcome = {
 };
 
 const App = () => {
-	const stories = [
+	const initialStories = [
 		{
 			id: 0,
 			title: "React",
@@ -27,7 +28,15 @@ const App = () => {
 			points: 5,
 		},
 	];
+
+	const [stories , setStories] = useState(initialStories);
+
 	const [searchTerm, setSearchTerm] = useStorageState("search", "");
+
+	const handleRemoveStory = (id)=>{
+		const newStories = stories.filter(story => story.id !== id);
+		setStories(newStories);
+	}
 	const handleSearch = (event) => {
 		setSearchTerm(event.target.value);
 	};
@@ -48,7 +57,7 @@ const App = () => {
 				onInputChange={handleSearch}
 				isFocused={true}
 			/>
-			<List list={searchStories} />
+			<List list={searchStories} onRemoveItem={handleRemoveStory} />
 		</div>
 	);
 };
